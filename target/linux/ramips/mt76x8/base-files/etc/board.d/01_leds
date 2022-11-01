@@ -37,7 +37,7 @@ hilink,hlk-7628n|\
 skylab,skw92a)
 	ucidef_set_led_netdev "wifi_led" "wifi" "green:wlan" "wlan0"
 	;;
-hilink,hlk-7688a)|\
+hilink,hlk-7688a|\
 WMD-7688A)
 	ucidef_set_led_wlan "wlan" "WLAN" "green:wlan" "phy0tpt"
 	;;
