@@ -1,0 +1,42 @@
+#!/bin/sh
+[ -f /etc/banner ] && cat /etc/banner
+[ -e /tmp/.failsafe ] && cat /etc/banner.failsafe
+
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+export HOME=$(grep -e "^${USER:-root}:" /etc/passwd | cut -d ":" -f 6)
+export HOME=${HOME:-/root}
+export PS1='\u@\h:\w\$ '
+
+[ -x /bin/more ] || alias more=less
+[ -x /usr/bin/vim ] && alias vi=vim || alias vim=vi
+
+[ -z "$KSH_VERSION" -o \! -s /etc/mkshrc ] || . /etc/mkshrc
+
+[ -x /usr/bin/arp ] || arp() { cat /proc/net/arp; }
+[ -x /usr/bin/ldd ] || ldd() { LD_TRACE_LOADED_OBJECTS=1 $*; }
+
+[ -n "$FAILSAFE" ] || {
+	for FILE in /etc/profile.d/*.sh; do
+		[ -e "$FILE" ] && . "$FILE"
+	done
+	unset FILE
+}
+
+# tslib
+export TSLIB_ROOT=/opt/install-tslib
+export TSLIB_TSDEVICE=/dev/input/event0
+export TSLIB_CALIBFILE=/etc/pointercal
+export TSLIB_CONFFILE=$TSLIB_ROOT/etc/ts.conf
+export TSLIB_PLUGINDIR=$TSLIB_ROOT/lib/ts
+export TSLIB_FBDEVICE=/dev/fb0
+export QWS_MOUSE_PROTO=tslib:/dev/input/event0
+export LD_LIBRARY_PATH=$TSLIB_ROOT/lib:$LD_LIBRARY_PATH
+
+# Qt
+export QTDIR=/opt/qt4.8.3_mips
+export LD_LIBRARY_PATH=$QTDIR/lib:$QTDIR/plugins/imageformats:$LD_LIBRARY_PATH
+export QT_PLUGIN_PATH=$QTDIR/plugins
+export POINTERCAL_FILE=/etc/qt_pointercal											#触摸校准文件
+export QT_QWS_FONTDIR=$QTDIR/lib/fonts												#字库文件
+export QWS_KEYBOARD="TTY:/dev/tty1"													#键盘
+

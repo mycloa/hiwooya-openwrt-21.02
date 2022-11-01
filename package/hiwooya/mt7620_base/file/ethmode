@@ -1,0 +1,43 @@
+#!/bin/sh
+
+case $1 in
+w | 1)
+        echo "mode W"
+	    uci set network.@switch_vlan[0].ports=
+	    uci set network.@switch_vlan[1].ports='0 6t'
+        uci set network.wan.device=eth0.2
+        uci set network.wan6.device=eth0.2
+        uci commit
+        /etc/init.d/network restart      
+        ;;
+wllll | 2)
+        echo "mode WLLLL"
+        uci set network.@switch_vlan[0].ports='1 2 3 4 6t'
+	    uci set network.@switch_vlan[1].ports='0 6t'
+	    uci set network.wan.device=eth0.2
+	    uci set network.wan6.device=eth0.2
+	    uci commit
+        /etc/init.d/network restart      
+        ;;
+l | 3)
+        echo "mode L"
+	    uci set network.@switch_vlan[0].ports='0 6t'
+	    uci set network.@switch_vlan[1].ports=
+        uci set network.wan.device=
+        uci set network.wan6.device=
+        uci commit
+        /etc/init.d/network restart      
+        ;;
+lllll | 4)
+        echo "mode LLLLL"
+	    uci set network.@switch_vlan[0].ports='0 1 2 3 4 6t'
+	    uci set network.@switch_vlan[1].ports=
+        uci set network.wan.ifname=
+        uci set network.wan6.ifname=
+        uci commit
+        /etc/init.d/network restart      
+        ;;
+*)
+	echo "ethmode w/l/wllll/lllll"
+	;;
+esac

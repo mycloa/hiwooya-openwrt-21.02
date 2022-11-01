@@ -1,0 +1,92 @@
+#!/bin/sh
+
+basepath="/proc/device-tree"
+
+if [ -n "$1" ];then
+
+wifi down
+case $1 in
+apsta)
+	uci set wireless.default_radio0.disabled='1'
+	uci set wireless.radio0.disabled='0'
+	uci set wireless.ap0=wifi-iface
+	uci set wireless.ap0.device='radio0'
+	uci set wireless.ap0.network='lan'
+	uci set wireless.ap0.mode='ap'                                               
+	uci set wireless.ap0.ssid="Hiwooya"
+	uci set wireless.ap0.encryption='psk'
+	uci set wireless.ap0.key='1234567890'
+
+	uci set wireless.sta=wifi-iface
+	uci set wireless.sta.device='radio0'
+	uci set wireless.sta.mode='sta'
+	uci set wireless.sta.network='wwan'
+    	uci add_list firewall.@zone[1].network='wwan'
+	uci set wireless.sta.encryption='psk'
+
+	uci set network.wwan=interface
+	uci set network.wwan.proto='dhcp'
+	if [ -n "$2" ];then
+		uci set wireless.sta.ssid="$2"
+		if [ -n "$3" ];then
+		uci set wireless.sta.key="$3"
+		else
+		uci delete wireless.sta.ket
+		fi
+	fi
+	uci commit
+	/etc/init.d/network restart
+	;;
+sta)
+	uci set wireless.radio0.disabled='0'
+	uci set wireless.sta=wifi-iface
+	uci set wireless.sta.device='radio0'
+	uci set wireless.sta.mode='sta'
+	uci set wireless.sta.network='wwan'
+    uci add_list firewall.@zone[1].network='wwan'
+	uci set wireless.sta.encryption='psk'
+	if [ -n "$2" ];then
+		uci set wireless.sta.ssid="$2"
+		if [ -n "$3" ];then
+		uci set wireless.sta.key="$3"
+		else
+		uci delete wireless.sta.key
+		fi
+	fi
+	uci set wireless.default_radio0.disabled='1'
+	uci set wireless.ap0.disabled=1
+	uci set wireless.sta.disabled=0
+	uci set network.wwan=interface
+	uci set network.wwan.proto='dhcp'
+	uci commit
+	/etc/init.d/network restart
+	;;
+ap)
+	uci set wireless.default_radio0.disabled='1'
+	uci set wireless.radio0.disabled='0'
+	uci set wireless.ap0=wifi-iface
+	uci set wireless.ap0.device='radio0'
+	uci set wireless.ap0.network='lan'
+	uci set wireless.ap0.mode='ap'                                               
+	uci set wireless.ap0.ssid="Hiwooya"
+	uci set wireless.ap0.encryption='psk'
+	uci set wireless.ap0.key='1234567890'
+	uci set wireless.sta.disabled=1
+	uci set wireless.ap0.disabled=0
+
+	uci set network.wwan=interface
+	uci set network.wwan.proto='dhcp'
+	uci commit
+	/etc/init.d/network restart
+	;;
+*)
+	echo "Usage:"
+	echo "wifimode apsta/sta/ap <ssid> <key>"
+	echo "e.g.	wifimode apsta 	[ssid] [key]"
+	echo "		wifimode sta 	[ssid] [key]"
+	echo "		wifimode ap"
+esac
+wifi up
+fi
+
+

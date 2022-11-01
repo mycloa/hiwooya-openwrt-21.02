@@ -1,0 +1,50 @@
+#!/bin/sh
+
+case $1 in
+w | 1)
+        echo "mode W"
+        uci delete network.@device[0].ports
+		uci set network.wan.device=wan
+		uci set network.wan6.device=wan
+        uci add_list network.@device[0].ports=
+        uci commit
+        /etc/init.d/network restart      
+        ;;
+wllll | 2)
+        echo "mode WLLLL"
+		uci delete network.@device[0].ports
+		uci add_list network.@device[0].ports=lan1
+		uci add_list network.@device[0].ports=lan2
+		uci add_list network.@device[0].ports=lan3
+		uci add_list network.@device[0].ports=lan4
+		uci set network.wan.device=wan
+		uci set network.wan6.device=wan
+        uci commit
+        /etc/init.d/network restart      
+        ;;
+l | 3)
+        echo "mode L"
+		uci delete network.@device[0].ports
+		uci add_list network.@device[0].ports=wan
+		uci set network.wan.device=
+		uci set network.wan6.device=
+        uci commit
+        /etc/init.d/network restart      
+        ;;
+lllll | 4)
+        echo "mode LLLLL"
+		uci delete network.@device[0].ports
+		uci set network.wan.device=
+		uci set network.wan6.device=
+		uci add_list network.@device[0].ports=lan1
+		uci add_list network.@device[0].ports=lan2
+		uci add_list network.@device[0].ports=lan3
+		uci add_list network.@device[0].ports=lan4
+		uci add_list network.@device[0].ports=wan
+        uci commit
+        /etc/init.d/network restart      
+        ;;
+*)
+	echo "ethmode w/l/wllll/lllll"
+	;;
+esac
